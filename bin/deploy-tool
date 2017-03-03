@@ -1,3 +1,59 @@
 #!/usr/bin/perl
 
-print "I am running\n";
+use lib qw( ../lib );
+use DeployTool;
+use Getopt::Long;
+
+use constant DEFAULT_CONFIG_HOME => $ENV{HOME} . "/.deploy-tool";
+use constant DEFAULT_CONFIG_FILE => DEFAULT_CONFIG_HOME() . "/config.cfg";
+
+my (
+    $config_file,
+    $war_file,
+    $app_path,
+);
+
+GetOptions(
+    'config=s'      => \$config_file,
+    'war=s'         => \$war_file,
+    'app-path=s'    => \$app_path
+);
+
+my $config = $config_file ? _get_config($config_file) : _get_default_config();
+
+my $tool = DeployTool->new(some => "args");
+
+sub _get_config {
+    my $file_name = shift;
+    my $data;
+    {
+        local $/;
+        my $FH;
+        open( $FH, "<$file_name" ) or die "cannot open file $file_name\n";
+        $data = <$FH>;
+    }
+    $config = eval $data;
+    if ($@) {
+        die "Error of parsing configuration file $file_name: $@\n";
+    }
+    $config;
+}
+
+sub _get_default_config {
+    if ( !-f DEFAULT_CONFIG_FILE) {
+        mkdir DEFAULT_CONFIG_HOME();
+        _create_default_config();
+    }
+    _get_config( DEFAULT_CONFIG_FILE() );
+}
+
+sub _create_default_config {
+    my $FH;
+    open $FH, ">", DEFAULT_CONFIG_FILE() or die "cannot create default configuration " . DEFAULT_CONFIG_FILE() . "\n";
+    print $FH <<EOF;
+{
+    #put your configuration here in PERL HASH syntax
+};
+
+EOF
+}
