@@ -1,1 +1,2 @@
-deploy-tool --war app/target/test-app-1.0-SNAPSHOT.war --user=script --password=pass --hostname=localhost --port=8080 --app-path=/app
+deploy-tool --war app/target/test-app-1.0-SNAPSHOT.war --user=script --password=pass --hostname=localhost --port=8080 --app-path=/app --update
+deploy-tool status --user=script --password=pass --hostname=localhost --port=8080 --path=/app

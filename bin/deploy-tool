@@ -28,6 +28,7 @@ GetOptions(
     'hostname=s',
     'port=i',
     'ssl',
+    'update',
 );
 
 Data::Printer::p(%opts);
