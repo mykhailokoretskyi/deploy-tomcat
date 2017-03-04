@@ -80,7 +80,24 @@ sub stop {
 }
 
 sub undeploy {
+    my ($class, %args) = @_;
+    my $ua = LWP::UserAgent->new();
+    my $res = $ua->get(
+        "http". ($args{ssl} ? 's': '') . "://$args{user}:$args{password}\@$args{hostname}:$args{port}/manager/text/undeploy?path=$args{path}",
+    );
 
+    my $code = $res->code();
+    if (!$res->is_success()) {
+        die "Got bad response from Tomcat: $code\n";
+    }
+
+    $res->content() =~ /^(\w+)\s/;
+    if ($1 ne DeployTool::Constants::TOMCAT_DEPLOYMENT_OK()){
+        print STDERR $res->content();
+        return 0;
+    }
+
+    1;
 }
 
 1;

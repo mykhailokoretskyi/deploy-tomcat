@@ -57,7 +57,8 @@ sub stop {
 
 sub undeploy {
     my ($class, %args) = @_;
-    DeployTool::Service::Tomcat->undeploy(%args);
+    print "Undeploying the app... ";
+    print((DeployTool::Service::Tomcat->undeploy(%args) ? "OK" : "FAILED") . "\n");
 }
 
 1;
