@@ -2,7 +2,6 @@ package DeployTool;
 
 use strict;
 use DeployTool::Service::Tomcat;
-use DeployTool::Constants;
 
 sub deploy {
     my ($class, %args) = @_;
@@ -13,14 +12,10 @@ sub deploy {
         (%args)
     );
 
-    if ($response =~ /^(\w+)\s/) {
-        if ($1 ne DeployTool::Constants::TOMCAT_DEPLOYMENT_OK()) {
-            die "Tomcat failed deployment with: $response\n";
-        }
-    } else {
-        die "Cannot parse response from Tomcat server. Got: $response\n";
+    unless ($response) {
+        print "FAILED\n";
+        die 1;
     }
-
     print "OK\n";
 
     print "Verifying the app... ";

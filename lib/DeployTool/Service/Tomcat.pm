@@ -2,7 +2,6 @@ package DeployTool::Service::Tomcat;
 
 use strict;
 use LWP::UserAgent;
-use HTTP::Headers;
 use HTTP::Request::Common;
 use DeployTool::Constants;
 
@@ -21,7 +20,7 @@ sub deploy {
         )
     );
 
-    $res->content();
+    $class->_is_successful($res);
 }
 
 sub status {
@@ -64,7 +63,7 @@ sub undeploy {
 
     my $res = $class->_send_request(
         HTTP::Request::Common::GET(
-            $class->_get_base_url(%args, auth => 1) . "/manager/text/stop?path=$args{path}"
+            $class->_get_base_url(%args, auth => 1) . "/manager/text/undeploy?path=$args{path}",
         ),
     );
 

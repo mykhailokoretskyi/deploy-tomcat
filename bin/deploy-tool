@@ -5,7 +5,6 @@ use lib qw( ../lib );
 use DeployTool;
 use Getopt::Long;
 
-use LWP::UserAgent();
 use Data::Printer;
 
 use constant DEFAULT_CONFIG_HOME => $ENV{HOME} . "/.deploy-tool";
