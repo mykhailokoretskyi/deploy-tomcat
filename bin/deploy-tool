@@ -1,27 +1,46 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
+use strict;
 use lib qw( ../lib );
 use DeployTool;
 use Getopt::Long;
 
+use LWP::UserAgent();
+use Data::Printer;
+
 use constant DEFAULT_CONFIG_HOME => $ENV{HOME} . "/.deploy-tool";
 use constant DEFAULT_CONFIG_FILE => DEFAULT_CONFIG_HOME() . "/config.cfg";
 
-my (
-    $config_file,
-    $war_file,
-    $app_path,
-);
+my %opts = ();
+
+my $cmd = shift @ARGV;
+if (!DeployTool->can($cmd)) {
+    die "Wrong action\n";
+}
 
 GetOptions(
-    'config=s'      => \$config_file,
-    'war=s'         => \$war_file,
-    'app-path=s'    => \$app_path
+    \%opts,
+    'user=s',
+    'password=s',
+    'config=s',
+    'war=s',
+    'path=s',
+    'hostname=s',
+    'port=i',
+    'ssl',
 );
 
-my $config = $config_file ? _get_config($config_file) : _get_default_config();
+Data::Printer::p(%opts);
 
-my $tool = DeployTool->new(some => "args");
+my $config = $opts{config} ? _get_config(delete $opts{config}) : _get_default_config();
+
+# Lets merge config with args. Args has higher priority
+my %args = (
+    (%$config),
+    (%opts),
+);
+
+DeployTool->$cmd(%args);
 
 sub _get_config {
     my $file_name = shift;
