@@ -1,19 +1,19 @@
 #!/usr/bin/perl -w
 
 use strict;
-use lib qw( ../lib );
 use DeployTool;
 use Getopt::Long;
+use Class::Inspector;
 
 use Data::Printer;
 
-use constant DEFAULT_CONFIG_HOME => $ENV{HOME} . "/.deploy-tool";
-use constant DEFAULT_CONFIG_FILE => DEFAULT_CONFIG_HOME() . "/config.cfg";
-
 my %opts = ();
 
+my $commands = Class::Inspector->methods( 'DeployTool', 'full', 'public');
+
 my $cmd = shift @ARGV;
-if (!DeployTool->can($cmd)) {
+if (!grep { $_ =~ /::$cmd$/ } @$commands) {
+    #TODO: print usage here
     die "Wrong action\n";
 }
 
@@ -30,49 +30,4 @@ GetOptions(
     'update',
 );
 
-my $config = $opts{config} ? _get_config(delete $opts{config}) : _get_default_config();
-
-# Lets merge config with args. Args has higher priority
-my %args = (
-    (%$config),
-    (%opts),
-);
-
-Data::Printer::p(%args);
-
-DeployTool->$cmd(%args);
-
-sub _get_config {
-    my $file_name = shift;
-    my $data;
-    {
-        local $/;
-        my $FH;
-        open( $FH, "<$file_name" ) or die "cannot open file $file_name\n";
-        $data = <$FH>;
-    }
-    $config = eval $data;
-    if ($@) {
-        die "Error of parsing configuration file $file_name: $@\n";
-    }
-    $config;
-}
-
-sub _get_default_config {
-    if ( !-f DEFAULT_CONFIG_FILE) {
-        mkdir DEFAULT_CONFIG_HOME();
-        _create_default_config();
-    }
-    _get_config( DEFAULT_CONFIG_FILE() );
-}
-
-sub _create_default_config {
-    my $FH;
-    open $FH, ">", DEFAULT_CONFIG_FILE() or die "cannot create default configuration " . DEFAULT_CONFIG_FILE() . "\n";
-    print $FH <<EOF;
-{
-    #put your configuration here in PERL HASH syntax
-};
-
-EOF
-}
+DeployTool->_run_cmd($cmd, %opts);

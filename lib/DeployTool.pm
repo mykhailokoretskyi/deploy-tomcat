@@ -3,6 +3,61 @@ package DeployTool;
 use strict;
 use DeployTool::Service::Tomcat;
 
+use Data::Printer;
+
+use constant DEFAULT_CONFIG_HOME => $ENV{HOME} . "/.deploy-tool";
+use constant DEFAULT_CONFIG_FILE => DEFAULT_CONFIG_HOME() . "/config.cfg";
+
+sub _run_cmd {
+    my ($class, $cmd, %args) = @_;
+
+    my $config = $class->_read_config(%args);
+
+    Data::Printer::p($config);
+    $class->$cmd(%$config);
+}
+
+sub _read_config {
+    my ($class, %args) = @_;
+    my $config = $args{config} ? _get_config(delete $args{config}) : _get_default_config();
+    return {(%$config ,%args)};
+}
+
+sub _get_config {
+    my $file_name = shift;
+    my $data;
+    {
+        local $/;
+        my $FH;
+        open( $FH, "<$file_name" ) or die "cannot open file $file_name\n";
+        $data = <$FH>;
+    }
+    my $config = eval $data;
+    if ($@) {
+        die "Error of parsing configuration file $file_name: $@\n";
+    }
+    $config;
+}
+
+sub _get_default_config {
+    if ( !-f DEFAULT_CONFIG_FILE) {
+        mkdir DEFAULT_CONFIG_HOME();
+        _create_default_config();
+    }
+    _get_config( DEFAULT_CONFIG_FILE() );
+}
+
+sub _create_default_config {
+    my $FH;
+    open $FH, ">", DEFAULT_CONFIG_FILE() or die "cannot create default configuration " . DEFAULT_CONFIG_FILE() . "\n";
+    print $FH <<EOF;
+{
+    #put your configuration here in PERL HASH syntax
+};
+
+EOF
+}
+
 sub deploy {
     my ($class, %args) = @_;
 
