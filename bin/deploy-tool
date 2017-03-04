@@ -31,8 +31,6 @@ GetOptions(
     'update',
 );
 
-Data::Printer::p(%opts);
-
 my $config = $opts{config} ? _get_config(delete $opts{config}) : _get_default_config();
 
 # Lets merge config with args. Args has higher priority
@@ -40,6 +38,8 @@ my %args = (
     (%$config),
     (%opts),
 );
+
+Data::Printer::p(%args);
 
 DeployTool->$cmd(%args);
 
