@@ -17,11 +17,17 @@ WriteMakefile(
         'Test::More' => 0,
         'Test::Exception' => 0,
         'Test::DeepMock' => 0,
+        'Pod::Usage' => 0,
+        'Getopt::Long' => 0,
+        'Class::Inspector' => 0,
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
         'Test::Exception' => 0,
         'Test::DeepMock' => 0,
+        'Pod::Usage' => 0,
+        'Getopt::Long' => 0,
+        'Class::Inspector' => 0,
     },
     PREREQ_PM => {
     },

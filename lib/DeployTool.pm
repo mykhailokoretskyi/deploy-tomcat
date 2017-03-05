@@ -4,11 +4,11 @@ use 5.006;
 
 use strict;
 use DeployTool::Service::Tomcat;
-use Data::Dumper;
+require Data::Dumper; # should not import Dumper to this namespace
 $Data::Dumper::Terse = 1;
 
-use constant DEFAULT_CONFIG_HOME => $ENV{HOME} . "/.deploy-tool";
-use constant DEFAULT_CONFIG_FILE => DEFAULT_CONFIG_HOME() . "/config.cfg";
+use constant _DEFAULT_CONFIG_HOME => $ENV{HOME} . "/.deploy-tool";
+use constant _DEFAULT_CONFIG_FILE => _DEFAULT_CONFIG_HOME() . "/config.cfg";
 
 our $VERSION = "0.0.1";
 
@@ -56,13 +56,13 @@ sub _get_config {
 
 sub _get_default_config {
     my $class = shift;
-    if ( !-f DEFAULT_CONFIG_FILE) {
-        mkdir DEFAULT_CONFIG_HOME()
-            unless -d DEFAULT_CONFIG_HOME();
+    if ( !-f _DEFAULT_CONFIG_FILE) {
+        mkdir _DEFAULT_CONFIG_HOME()
+            unless -d _DEFAULT_CONFIG_HOME();
 
-        $class->_write_config(DEFAULT_CONFIG_FILE(), {});
+        $class->_write_config(_DEFAULT_CONFIG_FILE(), {});
     }
-    $class->_get_config( DEFAULT_CONFIG_FILE() );
+    $class->_get_config( _DEFAULT_CONFIG_FILE() );
 }
 
 sub _write_config {
@@ -143,7 +143,7 @@ sub config {
 
     map { $config_data->{$_} = $args{$_}; } keys %args;
     $class->_write_config(
-        $config_file || DEFAULT_CONFIG_FILE(),
+        $config_file || _DEFAULT_CONFIG_FILE(),
         $config_data,
     );
 }

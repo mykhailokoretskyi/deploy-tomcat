@@ -8,7 +8,10 @@ use Class::Inspector;
 
 my %opts = ();
 
-my $commands = Class::Inspector->methods( 'DeployTool', 'full', 'public');
+my $commands = Class::Inspector->methods( 'DeployTool', 'full', 'public' );
+
+use Data::Printer;
+Data::Printer::p($commands);
 
 my $cmd = shift @ARGV;
 if (!$cmd || !grep { $_ =~ /::$cmd$/ } @$commands) {
