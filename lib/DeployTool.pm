@@ -1,14 +1,16 @@
 package DeployTool;
 
+use 5.006;
+
 use strict;
 use DeployTool::Service::Tomcat;
 use Data::Dumper;
 $Data::Dumper::Terse = 1;
 
-use Data::Printer;
-
 use constant DEFAULT_CONFIG_HOME => $ENV{HOME} . "/.deploy-tool";
 use constant DEFAULT_CONFIG_FILE => DEFAULT_CONFIG_HOME() . "/config.cfg";
+
+our $VERSION = "0.0.1";
 
 my %validation_profile = (
     deploy => [ qw( hostname path war user password ) ],
@@ -24,12 +26,8 @@ sub _run_cmd {
     my ($class, $cmd, %args) = @_;
 
     my $config = $class->_read_config(%args);
-
-    Data::Printer::p($config);
-
     unless ( $class->_is_valid_config_for_cmd($cmd, $config) ) {
         $class->help();
-        return;
     }
     $class->$cmd(%$config);
 }
@@ -83,10 +81,6 @@ sub _is_valid_config_for_cmd {
         if ( grep { !exists $cnf->{$_} } @{$validation_profile{$cmd}} );
 
     1;
-}
-
-sub _print_usage {
-    print "Usage\n";
 }
 
 sub deploy {
@@ -155,7 +149,7 @@ sub config {
 }
 
 sub help {
-    print "USAGE will be printed here\n";
+    die "HELP";
 }
 
 1;

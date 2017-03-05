@@ -2,19 +2,17 @@
 
 use strict;
 use DeployTool;
+use Pod::Usage;
 use Getopt::Long;
 use Class::Inspector;
-
-use Data::Printer;
 
 my %opts = ();
 
 my $commands = Class::Inspector->methods( 'DeployTool', 'full', 'public');
 
 my $cmd = shift @ARGV;
-if (!grep { $_ =~ /::$cmd$/ } @$commands) {
-    #TODO: print usage here
-    die "Wrong action\n";
+if (!$cmd || !grep { $_ =~ /::$cmd$/ } @$commands) {
+    pod2usage(2);
 }
 
 GetOptions(
@@ -28,12 +26,99 @@ GetOptions(
     'port=i',
     'ssl',
     'update',
-);
+) or pod2usage(2);
 
 eval {
     DeployTool->_run_cmd($cmd, %opts);
 };
 
 if ($@) {
-    print "$@\n";
+    if ($@ =~ /^HELP/) {
+        pod2usage(2);
+    } else {
+        print "$@";
+        exit 1;
+    }
 }
+
+=pod
+
+=head1 NAME
+
+B<deploy-tool> - Tomcat deployment tool.
+
+=head1 SYNOPSIS
+
+deploy-tool I<command> [options]
+
+=head2 Commands
+
+=over 4
+
+=item I<B<deploy>>
+
+Deploys artifact to Tomcat container. Required options: I<hostname>, I<path>, I<war>, I<user>, I<password>.
+
+=item I<B<undeploy>>
+
+Undeploys artifact from Tomcat container. Required options: I<hostname>, I<path>, I<user>, I<password>.
+
+=item I<B<status>>
+
+Checks app`s availability by given app path. Required options: I<hostname>, I<path>.
+
+=item I<B<start>>
+
+Starts app by path on conatainer. Required options: I<hostname>, I<path>, I<user>, I<password>.
+
+=item I<B<stop>>
+
+Stops app by path on container. Required options: I<hostname>, I<path>, I<user>, I<password>.
+
+=item I<B<config>>
+
+Adds config items into config. By-default file B<~/.deploy-tool/config/cfg> is used.
+
+=back
+
+=head2 Options
+
+=over 4
+
+=item I<B<--conifig>>
+
+Sets alternate config file location.
+
+=item I<B<--hostname>>
+
+Hostname where Tomcat container is accessible.
+
+=item I<B<--port>>
+
+Port where Tomcat container is accessible.
+
+=item I<B<--user>>
+
+Username of Tomcat`s manager account with I<manager-script> role.
+
+=item I<B<--password>>
+
+Password of Tomcat`s manager account with I<manager-script> role.
+
+=item I<B<--path>>
+
+Artifact`s deployment path within Tomcat container.
+
+=item I<B<--war>>
+
+.war artifact location
+
+=item I<B<--ssl>>
+
+Set it, if Tomcat should be accessed over HTTPS.
+
+=item I<B<--update>>
+
+Set it if you want to deploy artifact for already deployed app.
+
+=back
