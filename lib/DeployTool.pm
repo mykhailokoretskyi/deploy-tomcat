@@ -2,11 +2,23 @@ package DeployTool;
 
 use strict;
 use DeployTool::Service::Tomcat;
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
 
 use Data::Printer;
 
 use constant DEFAULT_CONFIG_HOME => $ENV{HOME} . "/.deploy-tool";
 use constant DEFAULT_CONFIG_FILE => DEFAULT_CONFIG_HOME() . "/config.cfg";
+
+my %validation_profile = (
+    deploy => [ qw( hostname path war user password ) ],
+    undeploy => [ qw( hostname path user password ) ],
+    stop => [ qw( hostname path user password ) ],
+    start => [ qw( hostname path user password ) ],
+    config => [ qw(  ) ],
+    help => [ qw(  ) ],
+    status => [ qw( hostname path ) ],
+);
 
 sub _run_cmd {
     my ($class, $cmd, %args) = @_;
@@ -14,17 +26,22 @@ sub _run_cmd {
     my $config = $class->_read_config(%args);
 
     Data::Printer::p($config);
+
+    unless ( $class->_is_valid_config_for_cmd($cmd, $config) ) {
+        $class->help();
+        return;
+    }
     $class->$cmd(%$config);
 }
 
 sub _read_config {
     my ($class, %args) = @_;
-    my $config = $args{config} ? _get_config(delete $args{config}) : _get_default_config();
-    return {(%$config ,%args)};
+    my $config = $args{config} ? $class->_get_config($args{config}) : $class->_get_default_config();
+    return {(%$config ,%args, config_data => $config)};
 }
 
 sub _get_config {
-    my $file_name = shift;
+    my ($class, $file_name) = @_;
     my $data;
     {
         local $/;
@@ -40,22 +57,36 @@ sub _get_config {
 }
 
 sub _get_default_config {
+    my $class = shift;
     if ( !-f DEFAULT_CONFIG_FILE) {
-        mkdir DEFAULT_CONFIG_HOME();
-        _create_default_config();
+        mkdir DEFAULT_CONFIG_HOME()
+            unless -d DEFAULT_CONFIG_HOME();
+
+        $class->_write_config(DEFAULT_CONFIG_FILE(), {});
     }
-    _get_config( DEFAULT_CONFIG_FILE() );
+    $class->_get_config( DEFAULT_CONFIG_FILE() );
 }
 
-sub _create_default_config {
-    my $FH;
-    open $FH, ">", DEFAULT_CONFIG_FILE() or die "cannot create default configuration " . DEFAULT_CONFIG_FILE() . "\n";
-    print $FH <<EOF;
-{
-    #put your configuration here in PERL HASH syntax
-};
+sub _write_config {
+    my ($class, $file_name, $data) = @_;
 
-EOF
+    my $FH;
+    open $FH, ">", $file_name or die "cannot open file for writing: $file_name\n";
+    print $FH Data::Dumper::Dumper($data);
+    close $FH;
+}
+
+sub _is_valid_config_for_cmd {
+    my ($class, $cmd, $cnf) = @_;
+
+    return 0
+        if ( grep { !exists $cnf->{$_} } @{$validation_profile{$cmd}} );
+
+    1;
+}
+
+sub _print_usage {
+    print "Usage\n";
 }
 
 sub deploy {
@@ -109,6 +140,22 @@ sub undeploy {
     my ($class, %args) = @_;
     print "Undeploying the app... ";
     print((DeployTool::Service::Tomcat->undeploy(%args) ? "OK" : "FAILED") . "\n");
+}
+
+sub config {
+    my ($class, %args) = @_;
+    my $config_data = delete $args{config_data};
+    my $config_file = delete $args{config};
+
+    map { $config_data->{$_} = $args{$_}; } keys %args;
+    $class->_write_config(
+        $config_file || DEFAULT_CONFIG_FILE(),
+        $config_data,
+    );
+}
+
+sub help {
+    print "USAGE will be printed here\n";
 }
 
 1;

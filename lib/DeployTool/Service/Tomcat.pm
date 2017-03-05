@@ -91,9 +91,10 @@ sub _handle_http_errors {
 
 sub _get_base_url {
     my ($class, %args) = @_;
+
     return "http". ($args{ssl} ? 's': '') . "://" .
         ($args{auth} ? "$args{user}:$args{password}\@" : "") .
-        "$args{hostname}:$args{port}";
+        "$args{hostname}" . ($args{port} ? ":$args{port}" : "");
 }
 
 sub _is_successful {

@@ -30,4 +30,10 @@ GetOptions(
     'update',
 );
 
-DeployTool->_run_cmd($cmd, %opts);
+eval {
+    DeployTool->_run_cmd($cmd, %opts);
+};
+
+if ($@) {
+    print "$@\n";
+}
