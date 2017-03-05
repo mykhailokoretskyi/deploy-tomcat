@@ -1,3 +1,9 @@
 .idea/
 *.iml
 /app/target
+/Makefile
+/Makefile.old
+/MYMETA.*
+/DeployTool-*
+/pm_to_blib
+/blib
