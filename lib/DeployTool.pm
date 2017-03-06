@@ -86,7 +86,7 @@ sub _is_valid_config_for_cmd {
 sub deploy {
     my ($class, %args) = @_;
 
-    print "Starting Tomcat deployment... ";
+    print "Starting Tomcat deployment\n";
 
     my $response = DeployTool::Service::Tomcat->deploy(
         (%args)
@@ -96,44 +96,44 @@ sub deploy {
         print "FAILED\n";
         die 1;
     }
-    print "OK\n";
+    print "SUCCESS\n";
 
-    print "Verifying the app... ";
+    print "Verifying the app\n";
     my $is_running = DeployTool::Service::Tomcat->status(%args);
-    $is_running ? print "OK\n" : die "FAILED: app is not accessible\n";
+    $is_running ? print "SUCCESS\n" : die "FAILED: app is not accessible\n";
 }
 
 sub status {
     my ($class, %args) = @_;
 
-    print "Verifying the app... ";
+    print "Verifying the app\n";
     print( (DeployTool::Service::Tomcat->status(%args) ? "" : "NOT ") . "RUNNING\n" );
 }
 
 sub start {
     my ($class, %args) = @_;
-    print "Starting the app... ";
-    print( (DeployTool::Service::Tomcat->start(%args) ? "OK" : "FAILED") . "\n" );
+    print "Starting the app\n";
+    print( (DeployTool::Service::Tomcat->start(%args) ? "SUCCESS" : "FAILED") . "\n" );
 
-    print "Verifying the app... ";
+    print "Verifying the app\n";
     my $is_running = DeployTool::Service::Tomcat->status(%args);
-    $is_running ? print "OK\n" : die "FAILED: app is not accessible\n";
+    $is_running ? print "SUCCESS\n" : die "FAILED: app is not accessible\n";
 }
 
 sub stop {
     my ($class, %args) = @_;
-    print "Stopping the app... ";
-    print( (DeployTool::Service::Tomcat->stop(%args) ? "OK" : "FAILED") . "\n" );
+    print "Stopping the app\n";
+    print( (DeployTool::Service::Tomcat->stop(%args) ? "SUCCESS" : "FAILED") . "\n" );
 
-    print "Verifying the app... ";
+    print "Verifying the app\n";
     my $is_running = DeployTool::Service::Tomcat->status(%args);
-    $is_running ? die "FAILED: app is still accessible\n" : print "OK\n";
+    $is_running ? die "FAILED: app is still accessible\n" : print "SUCCESS\n";
 }
 
 sub undeploy {
     my ($class, %args) = @_;
-    print "Undeploying the app... ";
-    print((DeployTool::Service::Tomcat->undeploy(%args) ? "OK" : "FAILED") . "\n");
+    print "Undeploying the app\n";
+    print((DeployTool::Service::Tomcat->undeploy(%args) ? "SUCCESS" : "FAILED") . "\n");
 }
 
 sub config {

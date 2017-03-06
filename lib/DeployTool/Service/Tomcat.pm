@@ -5,8 +5,6 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use DeployTool::Constants;
 
-use Data::Printer;
-
 sub deploy {
     my ($class, %args) = @_;
 

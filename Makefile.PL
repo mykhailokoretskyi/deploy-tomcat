@@ -20,6 +20,7 @@ WriteMakefile(
         'Pod::Usage' => 0,
         'Getopt::Long' => 0,
         'Class::Inspector' => 0,
+        'Test::Output' => 0,
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
@@ -28,6 +29,7 @@ WriteMakefile(
         'Pod::Usage' => 0,
         'Getopt::Long' => 0,
         'Class::Inspector' => 0,
+        'Test::Output' => 0,
     },
     PREREQ_PM => {
     },
