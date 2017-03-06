@@ -25,3 +25,11 @@ Run `deploy-tool help` to get help on commands and keys.
 By default `~/.deploy-tool/config.cfg` is used for storing configuration.
 This behaviour might be overriden with `--config FILE` key.
 Configuration is stored as Data::Dumper (Terse => 1) serialized HASH.
+
+## Test .war app
+To get a hello-world .war app for testing:
+```
+cd app
+mvn package
+```
+After successful build, .war is available in `app/target` dir.
