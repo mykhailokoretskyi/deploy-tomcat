@@ -10,3 +10,5 @@ t/01-tool.t
 t/02-service.t
 t/mock/DeployTool/Service/Tomcat.pm
 t/mock/lib/MockFactory.pm
+t/mock/LWP/UserAgent.pm
+t/mock/HTTP/Request/Common.pm
